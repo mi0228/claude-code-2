@@ -106,7 +106,7 @@ export default function TodoList() {
 
   // TODOを期限でソート（期限が近い順、期限なしは最後）
   const sortedTodos = [...todos].sort((a, b) => {
-    if (!a.dueDate && !b.dueDate) return 0;
+    if (!(a.dueDate || b.dueDate)) return 0;
     if (!a.dueDate) return 1;
     if (!b.dueDate) return -1;
     return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
