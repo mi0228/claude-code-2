@@ -1,80 +1,80 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import styles from './todo.module.css'
-import type { WeatherApiResponse } from '../api/weather/route'
+import { useCallback, useEffect, useState } from "react";
+import type { WeatherApiResponse } from "../api/weather/route";
+import styles from "./todo.module.css";
 
 export default function WeatherDisplay() {
   // LocalStorageのキー名
-  const STORAGE_KEY = 'weatherCity'
+  const STORAGE_KEY = "weatherCity";
 
   // 天気データの状態管理
-  const [weatherData, setWeatherData] = useState<WeatherApiResponse | null>(null)
+  const [weatherData, setWeatherData] = useState<WeatherApiResponse | null>(null);
   // 都市名の状態管理
-  const [city, setCity] = useState('Tokyo')
+  const [_city, setCity] = useState("Tokyo");
   // 都市名入力フィールドの状態管理
-  const [cityInput, setCityInput] = useState('Tokyo')
+  const [cityInput, setCityInput] = useState("Tokyo");
   // ローディング状態
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   // エラー状態
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
   // 天気データを取得する関数
-  const fetchWeather = async (cityName: string) => {
-    setLoading(true)
-    setError(null)
+  const fetchWeather = useCallback(async (cityName: string) => {
+    setLoading(true);
+    setError(null);
 
     try {
-      const response = await fetch(`/api/weather?city=${encodeURIComponent(cityName)}`)
+      const response = await fetch(`/api/weather?city=${encodeURIComponent(cityName)}`);
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || '天気情報の取得に失敗しました')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "天気情報の取得に失敗しました");
       }
 
-      const data: WeatherApiResponse = await response.json()
-      setWeatherData(data)
-      setCity(cityName)
+      const data: WeatherApiResponse = await response.json();
+      setWeatherData(data);
+      setCity(cityName);
 
       // LocalStorageに都市名を保存
       try {
-        localStorage.setItem(STORAGE_KEY, cityName)
+        localStorage.setItem(STORAGE_KEY, cityName);
       } catch (error) {
-        console.error('都市名の保存に失敗しました:', error)
+        console.error("都市名の保存に失敗しました:", error);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : '天気情報の取得に失敗しました')
-      setWeatherData(null)
+      setError(err instanceof Error ? err.message : "天気情報の取得に失敗しました");
+      setWeatherData(null);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
   // 初回マウント時にLocalStorageから都市名を読み込んで天気を取得
   useEffect(() => {
     try {
-      const savedCity = localStorage.getItem(STORAGE_KEY)
-      const initialCity = savedCity || 'Tokyo'
-      setCityInput(initialCity)
-      fetchWeather(initialCity)
+      const savedCity = localStorage.getItem(STORAGE_KEY);
+      const initialCity = savedCity || "Tokyo";
+      setCityInput(initialCity);
+      fetchWeather(initialCity);
     } catch (error) {
-      console.error('都市名の読み込みに失敗しました:', error)
-      fetchWeather('Tokyo')
+      console.error("都市名の読み込みに失敗しました:", error);
+      fetchWeather("Tokyo");
     }
-  }, [])
+  }, [fetchWeather]);
 
   // 都市名変更ボタンのハンドラー
   const handleCityChange = () => {
-    if (cityInput.trim() === '') return
-    fetchWeather(cityInput.trim())
-  }
+    if (cityInput.trim() === "") return;
+    fetchWeather(cityInput.trim());
+  };
 
   // Enterキーで都市名変更
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleCityChange()
+    if (e.key === "Enter") {
+      handleCityChange();
     }
-  }
+  };
 
   return (
     <div className={styles.weatherContainer}>
@@ -91,11 +91,12 @@ export default function WeatherDisplay() {
           className={styles.cityInput}
         />
         <button
+          type="button"
           onClick={handleCityChange}
           className={styles.changeCityButton}
           disabled={loading}
         >
-          {loading ? '読込中...' : '変更'}
+          {loading ? "読込中..." : "変更"}
         </button>
       </div>
 
@@ -121,8 +122,8 @@ export default function WeatherDisplay() {
           </p>
 
           <div className={styles.forecastGrid}>
-            {weatherData.forecasts.map((forecast, index) => (
-              <div key={index} className={styles.forecastCard}>
+            {weatherData.forecasts.map((forecast) => (
+              <div key={forecast.date} className={styles.forecastCard}>
                 <div className={styles.forecastDate}>
                   {forecast.date}
                   <span className={styles.forecastDay}>({forecast.dayOfWeek})</span>
@@ -137,14 +138,12 @@ export default function WeatherDisplay() {
                   <span className={styles.tempSeparator}>/</span>
                   <span className={styles.tempMin}>{forecast.tempMin}°</span>
                 </div>
-                <div className={styles.forecastDescription}>
-                  {forecast.description}
-                </div>
+                <div className={styles.forecastDescription}>{forecast.description}</div>
               </div>
             ))}
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
