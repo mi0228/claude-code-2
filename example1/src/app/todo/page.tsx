@@ -1,6 +1,6 @@
-import TodoList from './TodoList'
-import WeatherDisplay from './WeatherDisplay'
-import styles from './todo.module.css'
+import TodoList from "./TodoList";
+import WeatherDisplay from "./WeatherDisplay";
+import styles from "./todo.module.css";
 
 // このページはServer Component（デフォルト）
 export default function TodoPage() {
@@ -14,5 +14,5 @@ export default function TodoPage() {
       {/* TODOリスト（Client Component） */}
       <TodoList />
     </main>
-  )
+  );
 }

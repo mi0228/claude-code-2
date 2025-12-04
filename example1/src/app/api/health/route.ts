@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import type { HealthCheckResponse } from "@/lib/types";
+import { NextResponse } from "next/server";
 
 /**
  * ヘルスチェックエンドポイント
